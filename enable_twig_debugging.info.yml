@@ -1,0 +1,6 @@
+name: 'Enable Twig Debugging'
+description: 'Enables Twig Debugging for your website'
+type: module
+core_version_requirement: ^9
+package: Other
+version: '0.0.1'

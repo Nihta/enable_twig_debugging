@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Enable Twig Debugging.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function enable_twig_debugging_install(): void {
+  $source = DRUPAL_ROOT . '/sites/default/default.services.yml';
+  $site_path = \Drupal::service('site.path');
+  $destination = DRUPAL_ROOT . '/' . $site_path . '/services.yml';
+
+  chmod(DRUPAL_ROOT . '/' . $site_path, 0777);
+  touch($destination);
+  copy($source, $destination);
+  chmod(DRUPAL_ROOT . '/' . $site_path, 0555);
+  file_put_contents($destination, str_replace('debug: false', 'debug: true', file_get_contents($destination)));
+  file_put_contents($destination, str_replace('auto_reload: null', 'auto_reload: false', file_get_contents($destination)));
+  file_put_contents($destination, str_replace('cache: true', 'cache: false', file_get_contents($destination)));
+  drupal_flush_all_caches();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function enable_twig_debugging_uninstall(): void {
+  $site_path = \Drupal::service('site.path');
+  $source = DRUPAL_ROOT . '/' . $site_path . '/' . 'services.yml';
+
+  chmod(DRUPAL_ROOT . '/' . $site_path, 0777);
+  file_put_contents($source, str_replace('debug: true', 'debug: false', file_get_contents($source)));
+  file_put_contents($source, str_replace('auto_reload: false', 'auto_reload: null', file_get_contents($source)));
+  file_put_contents($source, str_replace('cache: false', 'cache: true', file_get_contents($source)));
+  unlink($source);
+  chmod(DRUPAL_ROOT . '/' . $site_path, 0555);
+  drupal_flush_all_caches();
+}
